@@ -1,14 +1,13 @@
 package com.chatbot.project.dto;
 
 public class LoginResponse {
+    private String token;
 
-    private String message;
-
-    public LoginResponse(String message) {
-        this.message = message;
+    public LoginResponse(String token) {
+        this.token = token;
     }
 
-    public String getMessage() {
-        return message;
+    public String getToken() {
+        return token;
     }
 }

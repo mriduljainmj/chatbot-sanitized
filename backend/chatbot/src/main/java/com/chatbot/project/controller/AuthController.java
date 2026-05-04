@@ -7,12 +7,14 @@ import com.chatbot.project.service.AuthService;
 
 import jakarta.validation.Valid;
 
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-//@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000")
 public class AuthController {
 
 	private final AuthService authService;
@@ -28,9 +30,14 @@ public class AuthController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
+	public ResponseEntity<LoginResponse> login(
+	        @Valid @RequestBody LoginRequest request) {
 
-		authService.login(request);
-		return ResponseEntity.ok(new LoginResponse("Login successful"));
+	    LoginResponse response = authService.login(request);
+	    return ResponseEntity.ok(response);
 	}
+	
+	
+
+
 }
