@@ -97,21 +97,20 @@ export default function PromptPage() {
     }
   }
 
- async function loadMessages(chat: Chat) {
-  setActiveChat(chat.chatId);
+  async function loadMessages(chat: Chat) {
+    setActiveChat(chat.chatId);
 
-  // ✅ THIS IS WHERE IT GOES
-  setSelectedModel(chat.model);
+    setSelectedModel(chat.model ?? "gpt-4o");
 
-  const res = await fetch(
-    `http://localhost:8080/chats/${chat.chatId}/messages`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
+    const res = await fetch(
+      `http://localhost:8080/chats/${chat.chatId}/messages`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
 
-  setMessages(await res.json());
-}
+    setMessages(await res.json());
+  }
 
   async function deleteChat(chatId: string) {
     if (deletingChatId) return;
@@ -155,10 +154,13 @@ export default function PromptPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+
         body: JSON.stringify({
           chatId: messages.length === 0 ? null : activeChat,
           prompt: userMessage,
+          model: selectedModel,   // ✅ ADD THIS
         }),
+
       });
 
       if (!res.ok) throw new Error("Prompt failed");
@@ -263,20 +265,20 @@ export default function PromptPage() {
               Secure AI Agent
             </h1>
 
-            
-<select
-  value={selectedModel}
-  onChange={(e) => setSelectedModel(e.target.value)}
-  disabled={messages.length > 0}
-  className="
+
+            <select
+              value={selectedModel}
+              onChange={(e) => setSelectedModel(e.target.value)}
+              disabled={messages.length > 0}
+              className="
     rounded-md border px-3 py-1 text-sm
     disabled:bg-gray-100 disabled:cursor-not-allowed
   "
->
-  <option value="gpt-4o">GPT‑4o (Best)</option>
-  <option value="gpt-4.1">GPT‑4.1</option>
-  <option value="gpt-3.5-turbo">GPT‑3.5 (Fast)</option>
-</select>
+            >
+              <option value="gpt-4o">GPT‑4o (Best)</option>
+              <option value="gpt-4.1">GPT‑4.1</option>
+              <option value="gpt-3.5-turbo">GPT‑3.5 (Fast)</option>
+            </select>
 
           </div>
 

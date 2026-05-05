@@ -23,38 +23,36 @@ public class PromptController {
 	}
 
 	@PostMapping("/prompt")
-	public PromptResponse prompt(
-	        @RequestBody PromptRequest request,
-	        Authentication auth) {
+	public PromptResponse prompt(@RequestBody PromptRequest request, Authentication auth) {
 
-	    String userInput = request.getPrompt();
-	    String chatId = request.getChatId();
-	    String requestedModel = request.getModel(); // from frontend
+		String userInput = request.getPrompt();
+		String chatId = request.getChatId();
+		String requestedModel = request.getModel(); // from frontend
 
-	    // ✅ CREATE CHAT IF NEEDED
-	    if (chatId == null) {
-	        chatId = chatService.createChat(auth.getName(), requestedModel);
-	    } else {
-	        // ✅ ENFORCE SAME MODEL
-	        String storedModel = chatService.getChatModel(chatId);
-	        if (!storedModel.equals(requestedModel)) {
-	            throw new ResponseStatusException(
-	                HttpStatus.BAD_REQUEST,
-	                "AI model change is not allowed for this chat"
-	            );
-	        }
-	    }
+		if (requestedModel == null) {
+			requestedModel = "gpt-4o";
+		}
 
-	    chatService.saveMessage(chatId, "USER", userInput);
-	    chatService.updateChatTitleIfEmpty(chatId, userInput);
+		// ✅ CREATE CHAT IF NEEDED
+		if (chatId == null) {
+			chatId = chatService.createChat(auth.getName(), requestedModel);
+		} else {
+			// ✅ ENFORCE SAME MODEL
+			String storedModel = chatService.getChatModel(chatId);
+			if (!storedModel.equals(requestedModel)) {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+						"AI model change is not allowed for this chat");
+			}
+		}
 
-	    String aiResponse =
-	        promptService.processPrompt(userInput, requestedModel);
+		chatService.saveMessage(chatId, "USER", userInput);
+		chatService.updateChatTitleIfEmpty(chatId, userInput);
 
-	    chatService.saveMessage(chatId, "AI", aiResponse);
+		String aiResponse = promptService.processPrompt(userInput, requestedModel);
 
-	    return new PromptResponse(aiResponse, chatId);
+		chatService.saveMessage(chatId, "AI", aiResponse);
+
+		return new PromptResponse(aiResponse, chatId);
 	}
-
 
 }

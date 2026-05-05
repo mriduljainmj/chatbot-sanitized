@@ -29,13 +29,15 @@ public class ChatController {
 	}
 
 	@GetMapping
+
 	public List<ChatSummary> getChats(Authentication auth) {
 		return jdbcTemplate.query("""
-				    SELECT CHAT_ID, TITLE
+				    SELECT CHAT_ID, TITLE, MODEL
 				    FROM CHATBOT_DB.APP.CHATS
 				    WHERE USER_EMAIL = ?
 				    ORDER BY CREATED_AT DESC
-				""", (rs, i) -> new ChatSummary(rs.getString("CHAT_ID"), rs.getString("TITLE")), auth.getName());
+				""", (rs, i) -> new ChatSummary(rs.getString("CHAT_ID"), rs.getString("TITLE"), rs.getString("MODEL")),
+				auth.getName());
 	}
 
 	@GetMapping("/{chatId}/messages")
